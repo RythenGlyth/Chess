@@ -1,0 +1,799 @@
+<div class="color" id="WHITE">
+    <h1>WHITE</h1>
+    <div class="figures" id="figures-white">
+        <span id="white-t-1" class="figure">r</span>
+        <span id="white-p-1" class="figure">n</span>
+        <span id="white-l-1" class="figure">b</span>
+        <span id="white-k-1" class="figure">k</span>
+        <span id="white-d-1" class="figure">q</span>
+        <span id="white-l-2" class="figure">b</span>
+        <span id="white-p-2" class="figure">n</span>
+        <span id="white-t-2" class="figure">r</span>
+        <span id="white-b-1" class="figure">p</span>
+        <span id="white-b-2" class="figure">p</span>
+        <span id="white-b-3" class="figure">p</span>
+        <span id="white-b-4" class="figure">p</span>
+        <span id="white-b-5" class="figure">p</span>
+        <span id="white-b-6" class="figure">p</span>
+        <span id="white-b-7" class="figure">p</span>
+        <span id="white-b-8" class="figure">p</span>
+    </div>
+</div>
+<h1 id="currentplayer">'s turn</h1>
+<table id="fields">
+    <tr>
+        <td id="field-1-1"></td>
+        <td id="field-2-1"></td>
+        <td id="field-3-1"></td>
+        <td id="field-4-1"></td>
+        <td id="field-5-1"></td>
+        <td id="field-6-1"></td>
+        <td id="field-7-1"></td>
+        <td id="field-8-1"></td>
+    </tr>
+    <tr>
+        <td id="field-1-2"></td>
+        <td id="field-2-2"></td>
+        <td id="field-3-2"></td>
+        <td id="field-4-2"></td>
+        <td id="field-5-2"></td>
+        <td id="field-6-2"></td>
+        <td id="field-7-2"></td>
+        <td id="field-8-2"></td>
+    </tr>
+    <tr>
+        <td id="field-1-3"></td>
+        <td id="field-2-3"></td>
+        <td id="field-3-3"></td>
+        <td id="field-4-3"></td>
+        <td id="field-5-3"></td>
+        <td id="field-6-3"></td>
+        <td id="field-7-3"></td>
+        <td id="field-8-3"></td>
+    </tr>
+    <tr>
+        <td id="field-1-4"></td>
+        <td id="field-2-4"></td>
+        <td id="field-3-4"></td>
+        <td id="field-4-4"></td>
+        <td id="field-5-4"></td>
+        <td id="field-6-4"></td>
+        <td id="field-7-4"></td>
+        <td id="field-8-4"></td>
+    </tr>
+    <tr>
+        <td id="field-1-5"></td>
+        <td id="field-2-5"></td>
+        <td id="field-3-5"></td>
+        <td id="field-4-5"></td>
+        <td id="field-5-5"></td>
+        <td id="field-6-5"></td>
+        <td id="field-7-5"></td>
+        <td id="field-8-5"></td>
+    </tr>
+    <tr>
+        <td id="field-1-6"></td>
+        <td id="field-2-6"></td>
+        <td id="field-3-6"></td>
+        <td id="field-4-6"></td>
+        <td id="field-5-6"></td>
+        <td id="field-6-6"></td>
+        <td id="field-7-6"></td>
+        <td id="field-8-6"></td>
+    </tr>
+    <tr>
+        <td id="field-1-7"></td>
+        <td id="field-2-7"></td>
+        <td id="field-3-7"></td>
+        <td id="field-4-7"></td>
+        <td id="field-5-7"></td>
+        <td id="field-6-7"></td>
+        <td id="field-7-7"></td>
+        <td id="field-8-7"></td>
+    </tr>
+    <tr>
+        <td id="field-1-8"></td>
+        <td id="field-2-8"></td>
+        <td id="field-3-8"></td>
+        <td id="field-4-8"></td>
+        <td id="field-5-8"></td>
+        <td id="field-6-8"></td>
+        <td id="field-7-8"></td>
+        <td id="field-8-8"></td>
+    </tr>
+</table>
+<!--<button id="startbtn" onclick="start()">start</button>-->
+<div class="color" id="BLACK">
+    <h1>BLACK</h1>
+    <div class="figures" id="figures-black">
+        <span id="black-t-1" class="figure">t</span>
+        <span id="black-p-1" class="figure">m</span>
+        <span id="black-l-1" class="figure">v</span>
+        <span id="black-d-1" class="figure">w</span>
+        <span id="black-k-1" class="figure">l</span>
+        <span id="black-l-2" class="figure">v</span>
+        <span id="black-p-2" class="figure">m</span>
+        <span id="black-t-2" class="figure">t</span>
+        <span id="black-b-1" class="figure">o</span>
+        <span id="black-b-2" class="figure">o</span>
+        <span id="black-b-3" class="figure">o</span>
+        <span id="black-b-4" class="figure">o</span>
+        <span id="black-b-5" class="figure">o</span>
+        <span id="black-b-6" class="figure">o</span>
+        <span id="black-b-7" class="figure">o</span>
+        <span id="black-b-8" class="figure">o</span>
+    </div>
+</div>
+<script>
+    var isBot = {
+        black: {{isBlackBot}},
+        white: {{isWhiteBot}}
+    };
+
+    var gamestarted = false;
+    var currentplayer;
+    Array.from(Array.from(document.getElementById("fields").children)[0].children).forEach(c => {
+        Array.from(c.children).forEach(a => {
+            a.addEventListener("mousedown", (e) => {
+                if (gamestarted) {
+                    if (isBot[currentplayer] == false) {
+                        if (Array.from(a.children).length > 0) {
+                            var f = Array.from(a.children)[0];
+                            if (Array.from(document.getElementsByClassName("figures")).filter(a => Array.from(a.children).filter(b => b.id == f.id).length < 0).length < 1) {
+                                if (f.id.substring(0, 5) == currentplayer) {
+                                    removeSelected();
+                                    getFieldsForFigure(f.id).forEach(field => {
+                                        document.getElementById("field-" + field.x + "-" + field.y).classList.add(isFigureAtPosition(field.x, field.y) ? "oponentcangofield" : "cangofield");
+                                    });
+                                    f.parentElement.classList.add("selected");
+                                } else {
+                                    if (Array.from(document.getElementsByClassName("selected")).length > 0) {
+                                        var figurex = parseInt(f.parentElement.id.substring(6, 7), 10);
+                                        var figurey = parseInt(f.parentElement.id.substring(8, 9), 10);
+                                        var selectedid = Array.from(Array.from(document.getElementsByClassName("selected"))[0].children)[0].id;
+
+                                        if (getFieldsForFigure(selectedid).filter(f => (f.x == figurex) && (f.y == figurey)).length > 0) {
+                                            var removeelement = Array.from(document.getElementById("field-" + figurex + "-" + figurey).children)[0];
+                                            killed(removeelement.id);
+                                            //document.getElementById("figures-" + removeelement.id.substring(0, 5)).appendChild(removeelement);
+                                            document.getElementById("field-" + figurex + "-" + figurey).appendChild(document.getElementById(selectedid));
+                                            removeSelected();
+                                            nextPlayer();
+                                        } else {
+                                            addTooltip("It's " + currentplayer + " turn!");
+                                        }
+                                    } else {
+                                        addTooltip("It's " + currentplayer + " turn!");
+                                    }
+                                }
+                            }
+                        } else {
+                            if (Array.from(document.getElementsByClassName("selected")).length > 0) {
+                                var figurex = parseInt(a.id.substring(6, 7), 10);
+                                var figurey = parseInt(a.id.substring(8, 9), 10);
+                                var selectedid = Array.from(Array.from(document.getElementsByClassName("selected"))[0].children)[0].id;
+                                if (getFieldsForFigure(selectedid).filter(f => (f.x == figurex) && (f.y == figurey)).length > 0) {
+                                    document.getElementById("field-" + figurex + "-" + figurey).appendChild(document.getElementById(selectedid));
+                                    removeSelected();
+                                    nextPlayer();
+                                }
+                            }
+                        }
+                    } else {
+                        addTooltip("Current Player is a bot!");
+                    }
+                } else {
+                    addTooltip("Game isn't started!");
+                }
+            });
+        });
+    });
+
+    function removeSelected() {
+        Array.from(document.getElementsByClassName("cangofield")).forEach(e => {
+            e.classList.remove("cangofield");
+        });
+        Array.from(document.getElementsByClassName("oponentcangofield")).forEach(e => {
+            e.classList.remove("oponentcangofield");
+        });
+        Array.from(document.getElementsByClassName("selected")).forEach(e => {
+            e.classList.remove("selected");
+        });
+    }
+    function getFieldsForFigure(id) {
+        if (gamestarted) {
+            var type = id.substring(6, 7);
+            var color = id.substring(0, 5);
+            var currentx = parseInt(document.getElementById(id).parentElement.id.substring(6, 7), 10);
+            var currenty = parseInt(document.getElementById(id).parentElement.id.substring(8, 9), 10);
+            var fields = [];
+            if (type == "t") {
+                //LEFT
+                var newx1 = currentx - 1;
+                while ((newx1 > 0)) {
+                    if (!isFigureAtPosition(newx1, currenty)) {
+                        fields.push({ x: newx1, y: currenty });
+                    } else if (isOpponentAtPosition(newx1, currenty, color)) {
+                        fields.push({ x: newx1, y: currenty });
+                        break;
+                    } else {
+                        break;
+                    }
+                    newx1--;
+                }
+                //TOP
+                var newy1 = currenty - 1;
+                while ((newy1 > 0)) {
+                    if (!isFigureAtPosition(currentx, newy1)) {
+                        fields.push({ x: currentx, y: newy1 });
+                    } else if (isOpponentAtPosition(currentx, newy1, color)) {
+                        fields.push({ x: currentx, y: newy1 });
+                        break;
+                    } else {
+                        break;
+                    }
+                    newy1--;
+                }
+                //RIGHT
+                var newx1 = currentx + 1;
+                while ((newx1 < 9)) {
+                    if (!isFigureAtPosition(newx1, currenty)) {
+                        fields.push({ x: newx1, y: currenty });
+                    } else if (isOpponentAtPosition(newx1, currenty, color)) {
+                        fields.push({ x: newx1, y: currenty });
+                        break;
+                    } else {
+                        break;
+                    }
+                    newx1++;
+                }
+                //BOTTOM
+                var newy1 = currenty + 1;
+                while ((newy1 < 9)) {
+                    if (!isFigureAtPosition(currentx, newy1)) {
+                        fields.push({ x: currentx, y: newy1 });
+                    } else if (isOpponentAtPosition(currentx, newy1, color)) {
+                        fields.push({ x: currentx, y: newy1 });
+                        break;
+                    } else {
+                        break;
+                    }
+                    newy1++;
+                }
+            } else if (type == "p") {
+                if (!isFigureAtPosition(currentx + 2, currenty + 1)
+                    || isOpponentAtPosition(currentx + 2, currenty + 1, color)) fields.push({ x: currentx + 2, y: currenty + 1 });
+
+                if (!isFigureAtPosition(currentx + 2, currenty - 1)
+                    || isOpponentAtPosition(currentx + 2, currenty - 1, color)) fields.push({ x: currentx + 2, y: currenty - 1 });
+
+                if (!isFigureAtPosition(currentx - 2, currenty + 1)
+                    || isOpponentAtPosition(currentx - 2, currenty + 1, color)) fields.push({ x: currentx - 2, y: currenty + 1 });
+
+                if (!isFigureAtPosition(currentx - 2, currenty - 1)
+                    || isOpponentAtPosition(currentx - 2, currenty - 1, color)) fields.push({ x: currentx - 2, y: currenty - 1 });
+
+                if (!isFigureAtPosition(currentx + 1, currenty + 2)
+                    || isOpponentAtPosition(currentx + 1, currenty + 2, color)) fields.push({ x: currentx + 1, y: currenty + 2 });
+
+                if (!isFigureAtPosition(currentx - 1, currenty + 2)
+                    || isOpponentAtPosition(currentx - 1, currenty + 2, color)) fields.push({ x: currentx - 1, y: currenty + 2 });
+
+                if (!isFigureAtPosition(currentx + 1, currenty - 2)
+                    || isOpponentAtPosition(currentx + 1, currenty - 2, color)) fields.push({ x: currentx + 1, y: currenty - 2 });
+
+                if (!isFigureAtPosition(currentx - 1, currenty - 2)
+                    || isOpponentAtPosition(currentx - 1, currenty - 2, color)) fields.push({ x: currentx - 1, y: currenty - 2 });
+
+            } else if (type == "l") {
+                //LEFT-TOP
+                var newx1 = currentx - 1;
+                var newy1 = currenty - 1;
+                while ((newx1 > 0) && (newy1 > 0)) {
+                    if (!isFigureAtPosition(newx1, newy1)) {
+                        fields.push({ x: newx1, y: newy1 });
+                    } else if (isOpponentAtPosition(newx1, newy1, color)) {
+                        fields.push({ x: newx1, y: newy1 });
+                        break;
+                    } else {
+                        break;
+                    }
+                    newx1--;
+                    newy1--;
+                }
+                //RIGHT-TOP
+                var newx2 = currentx + 1;
+                var newy2 = currenty - 1;
+                while ((newx2 < 9) && (newy2 > 0)) {
+                    if (!isFigureAtPosition(newx2, newy2)) {
+                        fields.push({ x: newx2, y: newy2 });
+                    } else if (isOpponentAtPosition(newx2, newy2, color)) {
+                        fields.push({ x: newx2, y: newy2 });
+                        break;
+                    } else {
+                        break;
+                    }
+                    if (getFigureAtPosition(newx2, newy2)) {
+                        break;
+                    }
+                    newx2++;
+                    newy2--;
+                }
+                //RIGHT-BOTTOM
+                var newx3 = currentx + 1;
+                var newy3 = currenty + 1;
+                while ((newx3 < 9) && (newy3 < 9)) {
+                    if (!isFigureAtPosition(newx3, newy3)) {
+                        fields.push({ x: newx3, y: newy3 });
+                    } else if (isOpponentAtPosition(newx3, newy3, color)) {
+                        fields.push({ x: newx3, y: newy3 });
+                        break;
+                    } else {
+                        break;
+                    }
+                    newx3++;
+                    newy3++;
+                }
+                //LEFT-BOTTOM
+                var newx4 = currentx - 1;
+                var newy4 = currenty + 1;
+                while ((newx4 > 0) && (newy4 < 9)) {
+                    if (!isFigureAtPosition(newx4, newy4)) {
+                        fields.push({ x: newx4, y: newy4 });
+                    } else if (isOpponentAtPosition(newx4, newy4, color)) {
+                        fields.push({ x: newx4, y: newy4 });
+                        break;
+                    } else {
+                        break;
+                    }
+                    newx4--;
+                    newy4++;
+                }
+            } else if (type == "k") {
+                if (!isFigureAtPosition(currentx + 0, currenty + 1)
+                    || (isOpponentAtPosition(currentx + 0, currenty + 1, color))) fields.push({ x: currentx + 0, y: currenty + 1 });
+
+                if (!isFigureAtPosition(currentx + 0, currenty - 1)
+                    || (isOpponentAtPosition(currentx + 0, currenty - 1, color))) fields.push({ x: currentx + 0, y: currenty - 1 });
+
+                if (!isFigureAtPosition(currentx + 1, currenty + 0)
+                    || (isOpponentAtPosition(currentx + 1, currenty + 0, color))) fields.push({ x: currentx + 1, y: currenty + 0 });
+
+                if (!isFigureAtPosition(currentx - 1, currenty + 0)
+                    || (isOpponentAtPosition(currentx - 1, currenty + 0, color))) fields.push({ x: currentx - 1, y: currenty + 0 });
+
+                if (!isFigureAtPosition(currentx + 1, currenty + 1)
+                    || (isOpponentAtPosition(currentx + 1, currenty + 1, color))) fields.push({ x: currentx + 1, y: currenty + 1 });
+
+                if (!isFigureAtPosition(currentx - 1, currenty - 1)
+                    || (isOpponentAtPosition(currentx - 1, currenty - 1, color))) fields.push({ x: currentx - 1, y: currenty - 1 });
+
+                if (!isFigureAtPosition(currentx + 1, currenty - 1)
+                    || (isOpponentAtPosition(currentx + 1, currenty - 1, color))) fields.push({ x: currentx + 1, y: currenty - 1 });
+
+                if (!isFigureAtPosition(currentx - 1, currenty + 1)
+                    || (isOpponentAtPosition(currentx - 1, currenty + 1, color))) fields.push({ x: currentx - 1, y: currenty + 1 });
+            } else if (type == "d") {
+                //LEFT
+                var newx1 = currentx - 1;
+                while ((newx1 > 0)) {
+                    if (!isFigureAtPosition(newx1, currenty)) {
+                        fields.push({ x: newx1, y: currenty });
+                    } else if (isOpponentAtPosition(newx1, currenty, color)) {
+                        fields.push({ x: newx1, y: currenty });
+                        break;
+                    } else {
+                        break;
+                    }
+                    newx1--;
+                }
+                //TOP
+                var newy1 = currenty - 1;
+                while ((newy1 > 0)) {
+                    if (!isFigureAtPosition(currentx, newy1)) {
+                        fields.push({ x: currentx, y: newy1 });
+                    } else if (isOpponentAtPosition(currentx, newy1, color)) {
+                        fields.push({ x: currentx, y: newy1 });
+                        break;
+                    } else {
+                        break;
+                    }
+                    newy1--;
+                }
+                //RIGHT
+                var newx1 = currentx + 1;
+                while ((newx1 < 9)) {
+                    if (!isFigureAtPosition(newx1, currenty)) {
+                        fields.push({ x: newx1, y: currenty });
+                    } else if (isOpponentAtPosition(newx1, currenty, color)) {
+                        fields.push({ x: newx1, y: currenty });
+                        break;
+                    } else {
+                        break;
+                    }
+                    newx1++;
+                }
+                //BOTTOM
+                var newy1 = currenty + 1;
+                while ((newy1 < 9)) {
+                    if (!isFigureAtPosition(currentx, newy1)) {
+                        fields.push({ x: currentx, y: newy1 });
+                    } else if (isOpponentAtPosition(currentx, newy1, color)) {
+                        fields.push({ x: currentx, y: newy1 });
+                        break;
+                    } else {
+                        break;
+                    }
+                    newy1++;
+                }
+                //LEFT-TOP
+                var newx1 = currentx - 1;
+                var newy1 = currenty - 1;
+                while ((newx1 > 0) && (newy1 > 0)) {
+                    if (!isFigureAtPosition(newx1, newy1)) {
+                        fields.push({ x: newx1, y: newy1 });
+                    } else if (isOpponentAtPosition(newx1, newy1, color)) {
+                        fields.push({ x: newx1, y: newy1 });
+                        break;
+                    } else {
+                        break;
+                    }
+                    newx1--;
+                    newy1--;
+                }
+                //RIGHT-TOP
+                var newx2 = currentx + 1;
+                var newy2 = currenty - 1;
+                while ((newx2 < 9) && (newy2 > 0)) {
+                    if (!isFigureAtPosition(newx2, newy2)) {
+                        fields.push({ x: newx2, y: newy2 });
+                    } else if (isOpponentAtPosition(newx2, newy2, color)) {
+                        fields.push({ x: newx2, y: newy2 });
+                        break;
+                    } else {
+                        break;
+                    }
+                    if (getFigureAtPosition(newx2, newy2)) {
+                        break;
+                    }
+                    newx2++;
+                    newy2--;
+                }
+                //RIGHT-BOTTOM
+                var newx3 = currentx + 1;
+                var newy3 = currenty + 1;
+                while ((newx3 < 9) && (newy3 < 9)) {
+                    if (!isFigureAtPosition(newx3, newy3)) {
+                        fields.push({ x: newx3, y: newy3 });
+                    } else if (isOpponentAtPosition(newx3, newy3, color)) {
+                        fields.push({ x: newx3, y: newy3 });
+                        break;
+                    } else {
+                        break;
+                    }
+                    newx3++;
+                    newy3++;
+                }
+                //LEFT-BOTTOM
+                var newx4 = currentx - 1;
+                var newy4 = currenty + 1;
+                while ((newx4 > 0) && (newy4 < 9)) {
+                    if (!isFigureAtPosition(newx4, newy4)) {
+                        fields.push({ x: newx4, y: newy4 });
+                    } else if (isOpponentAtPosition(newx4, newy4, color)) {
+                        fields.push({ x: newx4, y: newy4 });
+                        break;
+                    } else {
+                        break;
+                    }
+                    newx4--;
+                    newy4++;
+                }
+            } else if (type == "b") {
+                if (color == "black") {
+                    if (!isFigureAtPosition(currentx - 1, currenty)) {
+                        fields.push({ x: currentx - 1, y: currenty });
+                        if ((currentx == 7) && (!isFigureAtPosition(currentx - 2, currenty))) {
+                            fields.push({ x: currentx - 2, y: currenty });
+                        }
+                    }
+                    if (isOpponentAtPosition(currentx - 1, currenty + 1, color)) {
+                        fields.push({ x: currentx - 1, y: currenty + 1 });
+                    }
+                    if (isOpponentAtPosition(currentx - 1, currenty - 1, color)) {
+                        fields.push({ x: currentx - 1, y: currenty - 1 });
+                    }
+                } else {
+                    if (!isFigureAtPosition(currentx + 1, currenty)) {
+                        fields.push({ x: currentx + 1, y: currenty });
+                        if ((currentx == 2) && (!isFigureAtPosition(currentx + 2, currenty))) {
+                            fields.push({ x: currentx + 2, y: currenty });
+                        }
+                    }
+                    if (isOpponentAtPosition(currentx + 1, currenty + 1, color)) {
+                        fields.push({ x: currentx + 1, y: currenty + 1 });
+                    }
+                    if (isOpponentAtPosition(currentx + 1, currenty - 1, color)) {
+                        fields.push({ x: currentx + 1, y: currenty - 1 });
+                    }
+                }
+            }
+            var filteredfields = [];
+            fields.forEach(f => {
+                if (!((f.x == currentx) && (f.y == currenty))) {
+                    if (((f.x < 9) && (f.y < 9) && (f.x > 0) && (f.y > 0))) {
+                        filteredfields.push(f);
+                    }
+                }
+            });
+            return filteredfields;
+        }
+    }
+    function isOpponentAtPosition(x, y, selfcolor) {
+        var figure = getFigureAtPosition(x, y);
+        if (figure) {
+            if (figure.id.substring(0, 5) != selfcolor) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+    function getFreeFields() {
+        var fields = [];
+        var x = 1;
+        while (x < 9) {
+            var y = 1;
+            while (y < 9) {
+                if (!getFigureAtPosition(x, y)) {
+                    fields.push({ x, y });
+                }
+                y++;
+            }
+            x++;
+        }
+        return fields;
+    }
+    function isFigureAtPosition(x, y) {
+        if (document.getElementById("field-" + x + "-" + y)) {
+            return (document.getElementById("field-" + x + "-" + y).children.length > 0);
+        }
+    }
+    function getFigureAtPosition(x, y) {
+        if (document.getElementById("field-" + x + "-" + y)) {
+            return document.getElementById("field-" + x + "-" + y).children[0];
+        }
+    }
+    function nextPlayer() {
+        if (Array.from(document.getElementsByClassName("figures")).filter(a => Array.from(a.children).filter(b => b.id == "black-k-1").length > 0).length > 0) {
+            /*var element = document.createElement("div");
+            element.style.position = "fixed";
+            element.style.left = "0";
+            element.style.right = "0";
+            element.style.bottom = "0";
+            element.style.top = "0";
+            element.style.textAlign = "center";
+            element.style.backgroundColor = "#1e1e1e";
+            element.style.color = "#fff";
+            element.innerHTML = "<h1>White won the game!</h1>";
+            document.body.appendChild(element);*/
+            gamestarted = false;
+            document.getElementById("currentplayer").innerText = "White has won the game!";
+            if(isBot.black) socket.emit("end", {
+                won: false,
+                moves: botMoves.black
+            });
+            if(isBot.white) socket.emit("end", {
+                won: true,
+                moves: botMoves.white
+            });
+        } else if (Array.from(document.getElementsByClassName("figures")).filter(a => Array.from(a.children).filter(b => b.id == "white-k-1").length > 0).length > 0) {
+            /*var element = document.createElement("div");
+            element.style.position = "fixed";
+            element.style.left = "0";
+            element.style.right = "0";
+            element.style.bottom = "0";
+            element.style.top = "0";
+            element.style.textAlign = "center";
+            element.style.backgroundColor = "#1e1e1e";
+            element.style.color = "#fff";
+            element.innerHTML = "<h1>Black won the game!</h1>";
+            document.body.appendChild(element);*/
+            gamestarted = false;
+            if(isBot.black) socket.emit("end", {
+                won: true,
+                moves: botMoves.black
+            });
+            if(isBot.white) socket.emit("end", {
+                won: false,
+                moves: botMoves.white
+            });
+        } else {
+            if (currentplayer == "white") {
+                changeCurrentPlayer("black");
+            } else {
+                changeCurrentPlayer("white");
+            }
+            return;
+        }
+        if(autoReplay == true) {
+            start();
+        }
+    }
+    var autoReplay = {{autoReplay}};
+    function getFigurePosition(id) {
+        var parentID = document.getElementById(id).parentElement.id;
+        return {
+            x: parseInt(parentID.substring(6, 7)),
+            y: parseInt(parentID.substring(8, 9))
+        };
+    }
+    function getMovesFigure(id) {
+        var figurePosition = getFigurePosition(id);
+        return getFieldsForFigure(id).map(field => {
+            return { fromX: figurePosition.x, fromY: figurePosition.y, toX: field.x, toY: field.y }
+        });
+    }
+    function getAllMoves() {
+        var fields = [];
+        fields = fields.concat(getMovesFigure(currentplayer + "-t-1"));
+        fields = fields.concat(getMovesFigure(currentplayer + "-p-1"));
+        fields = fields.concat(getMovesFigure(currentplayer + "-l-1"));
+        fields = fields.concat(getMovesFigure(currentplayer + "-d-1"));
+        fields = fields.concat(getMovesFigure(currentplayer + "-k-1"));
+        fields = fields.concat(getMovesFigure(currentplayer + "-l-2"));
+        fields = fields.concat(getMovesFigure(currentplayer + "-p-2"));
+        fields = fields.concat(getMovesFigure(currentplayer + "-t-2"));
+
+        fields = fields.concat(getMovesFigure(currentplayer + "-b-1"));
+        fields = fields.concat(getMovesFigure(currentplayer + "-b-2"));
+        fields = fields.concat(getMovesFigure(currentplayer + "-b-3"));
+        fields = fields.concat(getMovesFigure(currentplayer + "-b-4"));
+        fields = fields.concat(getMovesFigure(currentplayer + "-b-5"));
+        fields = fields.concat(getMovesFigure(currentplayer + "-b-6"));
+        fields = fields.concat(getMovesFigure(currentplayer + "-b-7"));
+        fields = fields.concat(getMovesFigure(currentplayer + "-b-8"));
+        return fields;
+    }
+    function getAllMovesInverted() {
+        return getAllMoves().map(move => {
+            var invertedFrom = getInvertedIfNeeded(move.fromX, move.fromY);
+            var invertedTo = getInvertedIfNeeded(move.toX, move.toY);
+            return {
+                fromX: invertedFrom.x,
+                fromY: invertedFrom.y,
+                toX: invertedTo.x,
+                toY: invertedTo.y
+            };
+        });
+    }
+    function changeCurrentPlayer(color) {
+        document.getElementById("currentplayer").innerText = color + "'s turn";
+        currentplayer = color;
+        if (isBot[color] == true) {
+            var statusSerialized = serialize();
+            socket.emit("setDefaults", {
+                statusSerialized,
+                moves: getAllMovesInverted()
+            });
+            socket.emit("requestMove", {
+                statusSerialized
+            });
+        }
+    }
+
+    function getPos(fromX, fromY, toX, toY) {
+        var pos = 0;
+        pos |= (fromX - 1) << 0;
+        pos |= (fromY - 1) << 3;
+        pos |= (toX - 1) << 6;
+        pos |= (toY - 1) << 9;
+        return pos;
+    }
+    var botMoves = {
+        "white": [
+
+        ],
+        "black": [
+
+        ]
+    }
+    socket.on('botMove', (data) => {
+        console.log(data);
+        var invertedFrom = getInvertedIfNeeded(data.fromX, data.fromY);
+        var invertedTo = getInvertedIfNeeded(data.toX, data.toY);
+
+        var destFigure = getFigureAtPosition(invertedTo.x, invertedTo.y);
+        if(destFigure) {
+            killed(destFigure.id);
+        }
+        botMoves[currentplayer].push({ s: data.statusSerialized, p: getPos(data.fromX, data.fromY, data.toX, data.toY) });
+        move(getFigureAtPosition(invertedFrom.x, invertedFrom.y).id, invertedTo.x, invertedTo.y);
+        nextPlayer();
+    });
+    function serialize() {
+        var str = "";
+        for (var i = 1; i <= 8; i++) {
+            for (var j = 1; j <= 8; j++) {
+                var inverted = getInvertedIfNeeded(i, j);
+                var figure = getFigureAtPosition(inverted.x, inverted.y);
+                if (figure) {
+                    str += (figure.id.substring(0, 5) == currentplayer) ? "t" : "o";
+                    str += figure.id.substring(6, 7);
+                }
+                str += ";"
+            }
+        }
+        return str;
+    }
+    function getInvertedIfNeeded(x, y) {
+        return {
+            x: (currentplayer == "white" ? x : 9 - x),
+            y: (currentplayer == "white" ? y : 9 - y)
+        }
+    }
+    function addTooltip(message) {
+        var tooltip = document.createElement("div");
+        tooltip.classList.add("tooltip");
+        tooltip.innerText = message;
+        document.body.appendChild(tooltip);
+        setTimeout(() => {
+            tooltip.remove();
+        }, 2000);
+    }
+    function start() {
+        //document.getElementById("startbtn").style.display = "none";
+
+        move("white-t-1", 1, 1);
+        move("white-p-1", 1, 2);
+        move("white-l-1", 1, 3);
+        move("white-d-1", 1, 4);
+        move("white-k-1", 1, 5);
+        move("white-l-2", 1, 6);
+        move("white-p-2", 1, 7);
+        move("white-t-2", 1, 8);
+
+        move("white-b-1", 2, 1);
+        move("white-b-2", 2, 2);
+        move("white-b-3", 2, 3);
+        move("white-b-4", 2, 4);
+        move("white-b-5", 2, 5);
+        move("white-b-6", 2, 6);
+        move("white-b-7", 2, 7);
+        move("white-b-8", 2, 8);
+
+
+        move("black-b-1", 7, 1);
+        move("black-b-2", 7, 2);
+        move("black-b-3", 7, 3);
+        move("black-b-4", 7, 4);
+        move("black-b-5", 7, 5);
+        move("black-b-6", 7, 6);
+        move("black-b-7", 7, 7);
+        move("black-b-8", 7, 8);
+
+        move("black-t-1", 8, 1);
+        move("black-p-1", 8, 2);
+        move("black-l-1", 8, 3);
+        move("black-d-1", 8, 4);
+        move("black-k-1", 8, 5);
+        move("black-l-2", 8, 6);
+        move("black-p-2", 8, 7);
+        move("black-t-2", 8, 8);
+
+        gamestarted = true;
+        changeCurrentPlayer("white");
+    }
+
+    start();
+
+    function killed(id) {
+        document.getElementById("figures-" + id.substring(0, 5)).appendChild(document.getElementById(id));
+        document.getElementById("figures-" + id.substring(0, 5)).innerHTML = document.getElementById("figures-" + id.substring(0, 5)).innerHTML.replace(/<\/span><span/g, '</span>\n<span');
+    }
+    function move(id, x, y) {
+        document.getElementById("field-" + x + "-" + y).appendChild(document.getElementById(id));
+    }
+</script>
