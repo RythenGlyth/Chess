@@ -1,13 +1,17 @@
 const fs = require('fs');
 
-const { ChessAIData, ChessMove, ChessBoard } = require("./chessdata.js");
+const { ChessAIData, ChessMove, ChessBoard, ChessFigure, FigureTeam, FigureType } = require("./chessdata.js");
+const { ChessGame, ChessUtils } = require("./chessutils.js");
 
-var chessAIData = new ChessAIData();
-chessAIData.readFromBuffer(fs.readFileSync("chess.dat"));
+var chessAIData = ChessAIData.readFromBuffer(fs.readFileSync("chess.dat"));
 
+console.log(chessAIData.getMoves(new ChessBoard()));
 
-var buffer = Buffer.alloc(0);
-buffer = (new ChessBoard()).writeToBuffer(buffer);
+/*console.log(chessAIData);
+var buffer = chessAIData.writeToBuffer();
 console.log(buffer);
+var newChessAIData = ChessAIData.readFromBuffer(buffer);
+console.log(newChessAIData);
+*/
 
-console.log(true << 3);
+fs.writeFileSync("chess.dat", chessAIData.writeToBuffer());

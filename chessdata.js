@@ -5,10 +5,10 @@ class ChessAIData {
          * key: chessboard
          * 
          * value: array of possible moves
+         * 
+         * @type {Map<String, Array<ChessMove>>}
          */
-        this.statuses = {
-            
-        };
+        this.statuses = new Map();
     }
 
     /**
@@ -16,8 +16,8 @@ class ChessAIData {
      * @param {ChessBoard} status 
      * @returns {Array} moves
      */
-    getAvailableMoves(status) {
-        return this.statuses.get(status);
+    getMoves(status) {
+        return this.statuses.get(status.toString());
     }
 
     /**
@@ -25,29 +25,28 @@ class ChessAIData {
      * @param {Buffer} buffer 
      * @returns {ChessAIData}
      */
-    writeToBuffer(buffer) {
-        return this;
-    }
+    static readFromBuffer(buffer=Buffer.alloc(34)) {
+        var chessAIData = new ChessAIData();
 
-    /**
-     * 
-     * @returns {Buffer}
-     */
-    readFromBuffer() {
-        return Buffer.alloc(0);
-    }
+        var offset = 0;
+        while(offset < buffer.length) {
+            //var board = ChessBoard.readFromBuffer(buffer, offset).;
+            var board = buffer.toString("binary", offset, offset + 32);
+            offset += 32;
 
-}
+            var movesCount = buffer.readUInt16BE(offset);
+            offset += 2;
 
-class ChessMove {
+            var moves = [];
+            for(var i = 0; i < movesCount; i++) {
+                moves.push(ChessMove.readFromBuffer(buffer, offset));
+                offset += 4;
+            }
 
-    /**
-     * 
-     * @param {Buffer} buffer
-     * @returns {ChessMove}
-     */
-    readFromBuffer(buffer) {
-        return this;
+            chessAIData.statuses.set(board, moves);
+        }
+
+        return chessAIData;
     }
 
     /**
@@ -55,12 +54,102 @@ class ChessMove {
      * @returns {Buffer}
      */
     writeToBuffer() {
-        return Buffer.alloc(0);
+        var buffer = Buffer.alloc(0);
+        this.statuses.forEach((value, key) => {
+            var statusBuffer = Buffer.alloc(32 + 2 + value.length * 4);
+            var offset = 0;
+            
+            statusBuffer.write(key, offset, "binary");
+            offset += 32;
+            //offset = key.writeToBuffer(statusBuffer, offset);
+
+            offset = statusBuffer.writeUInt16BE(value.length, offset);
+            value.forEach(move => {
+                offset = move.writeToBuffer(statusBuffer, offset);
+            });
+            buffer = Buffer.concat([buffer, statusBuffer]);
+        });
+        return buffer;
     }
 
+    /**
+     * 
+     * @param {ChessBoard} status 
+     */
+    addDefaultMovesIfNeeded(status) {
+        //TODO add all availables
+        if(!this.statuses.has(status.toString())) {
+            var arr = [];
+            arr.push(new ChessMove(1, 2, 3, 4));
 
+            var stringifiedStatus = status.toString();
+
+            this.statuses.set(stringifiedStatus, arr);
+        }
+    }
+
+    toString() {
+        return this.writeToBuffer().toString("binary");
+    }
 
 }
+
+module.exports.ChessAIData = ChessAIData;
+
+class ChessMove {
+
+    constructor(fromX, fromY, toX, toY, weight) {
+        /** @type {Number} */
+        this.fromX = fromX || 0;
+
+        /** @type {Number} */
+        this.fromY = fromY || 0;
+
+        /** @type {Number} */
+        this.toX = toX || 0;
+
+        /** @type {Number} */
+        this.toY = toY || 0;
+
+        /** @type {Number} */
+        this.weight = weight == undefined ? 30000 : weight;
+    }
+
+    /**
+     * 
+     * @param {Buffer} buffer
+     * @returns {ChessMove}
+     */
+    static readFromBuffer(buffer=Buffer.alloc(4), offset=0) {
+        var int = buffer.readUInt16BE(offset);
+        var chessMove = new ChessMove();
+        chessMove.fromX = (int >>  0) & 0b0111;
+        chessMove.fromY = (int >>  4) & 0b0111;
+        chessMove.toX   = (int >>  8) & 0b0111;
+        chessMove.toY   = (int >> 12) & 0b0111;
+        chessMove.weight = buffer.readUInt16BE(offset + 2);
+        return chessMove;
+    }
+
+    /**
+     * 2 byte buffer
+     * @param {Buffer} buffer
+     * @returns {Number} offset plus the number of bytes written.
+     */
+    writeToBuffer(buffer=Buffer.alloc(2), offset=0) {
+        offset = buffer.writeUInt16BE(((this.fromX & 0b0111) << 0) | ((this.fromY & 0b0111) << 4) | ((this.toX & 0b0111) << 8) | ((this.toY & 0b0111) << 12), offset);
+        offset = buffer.writeUInt16BE(this.weight & 0b1111111111111111, offset);
+        return offset;
+    }
+
+    toString() {
+        var buffer = Buffer.alloc(2);
+        this.writeToBuffer(buffer);
+        return buffer.toString("binary");
+    }
+}
+
+module.exports.ChessMove = ChessMove;
 
 class ChessBoard {
 
@@ -74,57 +163,88 @@ class ChessBoard {
          * 
          */
         this.board = {
-            0: { 0: new Figure(), 1: new Figure(), 2: new Figure(), 3: new Figure(), 4: new Figure(), 5: new Figure(), 6: new Figure(), 7: new Figure() },
-            1: { 0: new Figure(), 1: new Figure(), 2: new Figure(), 3: new Figure(), 4: new Figure(), 5: new Figure(), 6: new Figure(), 7: new Figure() },
-            2: { 0: new Figure(), 1: new Figure(), 2: new Figure(), 3: new Figure(), 4: new Figure(), 5: new Figure(), 6: new Figure(), 7: new Figure() },
-            3: { 0: new Figure(), 1: new Figure(), 2: new Figure(), 3: new Figure(), 4: new Figure(), 5: new Figure(), 6: new Figure(), 7: new Figure() },
-            4: { 0: new Figure(), 1: new Figure(), 2: new Figure(), 3: new Figure(), 4: new Figure(), 5: new Figure(), 6: new Figure(), 7: new Figure() },
-            5: { 0: new Figure(), 1: new Figure(), 2: new Figure(), 3: new Figure(), 4: new Figure(), 5: new Figure(), 6: new Figure(), 7: new Figure() },
-            6: { 0: new Figure(), 1: new Figure(), 2: new Figure(), 3: new Figure(), 4: new Figure(), 5: new Figure(), 6: new Figure(), 7: new Figure() },
-            7: { 0: new Figure(), 1: new Figure(), 2: new Figure(), 3: new Figure(), 4: new Figure(), 5: new Figure(), 6: new Figure(), 7: new Figure() }
+            0: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() },
+            1: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() },
+            2: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() },
+            3: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() },
+            4: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() },
+            5: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() },
+            6: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() },
+            7: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() }
         };
     }
 
     /**
      * 
-     * @param {*} buffer 
+     * @param {Buffer} buffer 
      * @returns {ChessBoard}
      */
-    readFromBuffer(buffer) {
-        return this;
+    static readFromBuffer(buffer=Buffer.alloc(32), offset=0) {
+        var chessBoard = new ChessBoard();
+        for(var x = 0; x < 8; x++) {
+            var currentLine = buffer.readInt32BE(offset + x * 4);
+            for(var y = 0; y < 8; y++) {
+                chessBoard.board[x][y] = ChessFigure.readFromInt((currentLine >> (4 * y)) & 0b1111);
+            }
+        }
+        return chessBoard;
     }
 
     /**
-     * 
-     * @returns {Buffer}
+     * 32 bytes
+     * @param {Buffer} buffer
+     * @returns {Number} offset plus the number of bytes written.
      */
-    writeToBuffer() {
-        var buffer = Buffer.alloc(32);
+    writeToBuffer(buffer=Buffer.alloc(32), offset=0) {
         for(var x = 0; x < 8; x++) {
             var currentLine = 0b0;
             for(var y = 0; y < 8; y++) {
                 currentLine |= (this.board[x][y].writeToInt() & 0b1111) << (4 * y);
             }
-            buffer.writeInt32BE(currentLine, x * 4);
+            offset = buffer.writeInt32BE(currentLine, offset);
         }
-        return buffer;
-    }
-
-}
-
-class Figure {
-
-    constructor() {
-
+        return offset;
     }
 
     /**
      * 
-     * @param {*} buffer
+     * @param {Number} x
+     * @param {Number} y
+     * @returns {ChessFigure}
+     */
+    getFigure(x, y) {
+        return this.board[x][y];
+    }
+
+    toString() {
+        var buffer = Buffer.alloc(32);
+        this.writeToBuffer(buffer);
+        return buffer.toString("binary");
+    }
+
+}
+
+module.exports.ChessBoard = ChessBoard;
+
+class ChessFigure {
+
+    constructor(type, team) {
+        /** @type {FigureType} */
+        this.type = type || FigureType.NONE;
+        /** @type {FigureTeam} */
+        this.team = team || FigureTeam.THIS;
+    }
+
+    /**
+     * 
+     * @param {Number} int
      * @returns {Figure}
      */
-    readFromBuffer(buffer) {
-        return this;
+    static readFromInt(int) {
+        var chessFigure = new ChessFigure();
+        chessFigure.team = (int & 0b1000) >> 3;
+        chessFigure.type = int & 0b0111;
+        return chessFigure;
     }
 
     /**
@@ -132,37 +252,47 @@ class Figure {
      * @returns {Number}
      */
     writeToInt() {
-        return buffer;
+        return this.type + (this.team << 3);
+    }
+
+    /**
+     * @param {FigureType} type 
+     * @returns {ChessFigure}
+     */
+    setType(type) {
+        this.type = type;
+        return this;
+    }
+
+    /**
+     * @param {FigureTeam} team 
+     * @returns {ChessFigure}
+     */
+    setTeam(team) {
+        this.team = team;
+        return this;
+    }
+
+    toString() {
+        return this.writeToInt().toString(36);
     }
 }
 
-ChessAIData.prototype.toString = () => {
-    return writeToBuffer(Buffer.alloc(0));
-}
-
-ChessMove.prototype.toString = () => {
-    return writeToBuffer(Buffer.alloc(0));
-}
-
-ChessBoard.prototype.toString = () => {
-    return writeToBuffer(Buffer.alloc(0));
-}
-
-Figure.prototype.toString = () => {
-    return writeToBuffer(Buffer.alloc(0));
-}
+module.exports.ChessFigure = ChessFigure;
 
 const FigureType = Object.freeze({
-    NONE: 0,
-    KING: 1,
-    QUEEN: 2,
-    ROCK: 3,
-    KNIGHT: 4,
-    BISHOP: 5,
-    PAWN: 6
+    NONE:   0, //0b000
+    KING:   1, //0b001
+    QUEEN:  2, //0b010
+    ROCK:   3, //0b011
+    KNIGHT: 4, //0b100
+    BISHOP: 5, //0b101
+    PAWN:   6  //0b110
 });
+module.exports.FigureType = FigureType;
 
-module.exports.ChessAIData = ChessAIData;
-module.exports.ChessMove = ChessMove;
-module.exports.ChessBoard = ChessBoard;
-module.exports.Figure = Figure;
+const FigureTeam = Object.freeze({
+    THIS:  0,
+    OTHER: 1
+});
+module.exports.FigureTeam = FigureTeam;
