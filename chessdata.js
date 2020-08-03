@@ -161,17 +161,28 @@ class ChessBoard {
          * 
          * value: figure
          * 
+         * @type {Object.<number, Object.<number, ChessFigure>>}
          */
         this.board = {
-            0: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() },
-            1: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() },
+            0: { 0: new ChessFigure(FigureType.ROCK, FigureTeam.RELATIVE.OTHER), 1: new ChessFigure(FigureType.KNIGHT, FigureTeam.RELATIVE.OTHER), 2: new ChessFigure(FigureType.BISHOP, FigureTeam.RELATIVE.OTHER), 3: new ChessFigure(FigureType.QUEEN, FigureTeam.RELATIVE.OTHER), 4: new ChessFigure(FigureType.KING, FigureTeam.RELATIVE.OTHER), 5: new ChessFigure(FigureType.BISHOP, FigureTeam.RELATIVE.OTHER), 6: new ChessFigure(FigureType.KNIGHT, FigureTeam.RELATIVE.OTHER), 7: new ChessFigure(FigureType.ROCK, FigureTeam.RELATIVE.OTHER) },
+            1: { 0: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 1: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 2: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 3: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 4: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 5: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 6: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 7: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER) },
             2: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() },
             3: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() },
             4: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() },
             5: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() },
-            6: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() },
-            7: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() }
+            6: { 0: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 1: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 2: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 3: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 4: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 5: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 6: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 7: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS) },
+            7: { 0: new ChessFigure(FigureType.ROCK, FigureTeam.RELATIVE.THIS), 1: new ChessFigure(FigureType.KNIGHT, FigureTeam.RELATIVE.THIS), 2: new ChessFigure(FigureType.BISHOP, FigureTeam.RELATIVE.THIS), 3: new ChessFigure(FigureType.QUEEN, FigureTeam.RELATIVE.THIS), 4: new ChessFigure(FigureType.KING, FigureTeam.RELATIVE.THIS), 5: new ChessFigure(FigureType.BISHOP, FigureTeam.RELATIVE.THIS), 6: new ChessFigure(FigureType.KNIGHT, FigureTeam.RELATIVE.THIS), 7: new ChessFigure(FigureType.ROCK, FigureTeam.RELATIVE.THIS) }
         };
+    }
+
+    inverted() {
+        var newBoard = new ChessBoard();
+        for(var x = 0; x < 8; x++) {
+            for(var y = 0; y < 8; y++) {
+                newBoard.board[x][y] = Object.assign(Object.create(ChessFigure.prototype), this.board[7 - x][7 - y]);
+            }
+        }
+        return newBoard;
     }
 
     /**
@@ -213,7 +224,7 @@ class ChessBoard {
      * @returns {ChessFigure}
      */
     getFigure(x, y) {
-        return this.board[x][y];
+        return this.board[x] ? this.board[x][y] : null;
     }
 
     toString() {
@@ -228,11 +239,11 @@ module.exports.ChessBoard = ChessBoard;
 
 class ChessFigure {
 
-    constructor(type, team) {
+    constructor(type=FigureType.NONE, team=FigureTeam.RELATIVE.THIS) {
         /** @type {FigureType} */
-        this.type = type || FigureType.NONE;
-        /** @type {FigureTeam} */
-        this.team = team || FigureTeam.THIS;
+        this.type = type;
+        /** @type {Number} */
+        this.team = team;
     }
 
     /**
@@ -265,7 +276,7 @@ class ChessFigure {
     }
 
     /**
-     * @param {FigureTeam} team 
+     * @param {Number} team 
      * @returns {ChessFigure}
      */
     setTeam(team) {
@@ -292,7 +303,13 @@ const FigureType = Object.freeze({
 module.exports.FigureType = FigureType;
 
 const FigureTeam = Object.freeze({
-    THIS:  0,
-    OTHER: 1
+    RELATIVE: {
+        THIS: 0,
+        OTHER: 1
+    },
+    ABSOLUTE: {
+        WHITE: 0,
+        BLACK: 1
+    }
 });
 module.exports.FigureTeam = FigureTeam;
