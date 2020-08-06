@@ -6,7 +6,7 @@ class ChessAIData {
          * 
          * value: array of possible moves
          * 
-         * @type {Map<String, Array<ChessMove>>}
+         * @type {Map<String, ChessMove[]>}
          */
         this.statuses = new Map();
     }
@@ -14,10 +14,30 @@ class ChessAIData {
     /**
      * 
      * @param {ChessBoard} status 
-     * @returns {Array} moves
+     * @returns {ChessMove[]} moves
      */
     getMoves(status) {
         return this.statuses.get(status.toString());
+    }
+
+    /**
+     * @param {ChessBoard} status 
+     * @returns {?ChessMove} move
+     */
+    getRandomMove(status) {
+        var moves = this.getMoves(status)
+        var length = 0;
+        moves.forEach(move => {
+            length += move.weight;
+        });
+        var random = Math.floor(Math.random() * length);
+        var i = 0;
+        for(var move of moves) {
+            i += move.weight;
+            if(random <= i) {
+                return move;
+            }
+        }
     }
 
     /**
@@ -80,7 +100,12 @@ class ChessAIData {
         //TODO add all availables
         if(!this.statuses.has(status.toString())) {
             var arr = [];
-            arr.push(new ChessMove(1, 2, 3, 4));
+
+            for(var x = 0; x <= 7; x++) {
+                for(var y = 0; y <= 7; y++) {
+                    arr.push(...ChessUtils.getPossibleFields(status, x, y).map(val => new ChessMove(val.fromX, val.fromY, val.toX, val.toY)));
+                }
+            }
 
             var stringifiedStatus = status.toString();
 
@@ -154,6 +179,7 @@ module.exports.ChessMove = ChessMove;
 class ChessBoard {
 
     constructor() {
+        
         /**
          * two dimensional map
          * 
@@ -161,18 +187,34 @@ class ChessBoard {
          * 
          * value: figure
          * 
-         * @type {Object.<number, Object.<number, ChessFigure>>}
+         * @type {{[x: number]: {[y: number]: ChessFigure}}}
          */
         this.board = {
-            0: { 0: new ChessFigure(FigureType.ROCK, FigureTeam.RELATIVE.OTHER), 1: new ChessFigure(FigureType.KNIGHT, FigureTeam.RELATIVE.OTHER), 2: new ChessFigure(FigureType.BISHOP, FigureTeam.RELATIVE.OTHER), 3: new ChessFigure(FigureType.QUEEN, FigureTeam.RELATIVE.OTHER), 4: new ChessFigure(FigureType.KING, FigureTeam.RELATIVE.OTHER), 5: new ChessFigure(FigureType.BISHOP, FigureTeam.RELATIVE.OTHER), 6: new ChessFigure(FigureType.KNIGHT, FigureTeam.RELATIVE.OTHER), 7: new ChessFigure(FigureType.ROCK, FigureTeam.RELATIVE.OTHER) },
-            1: { 0: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 1: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 2: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 3: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 4: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 5: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 6: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 7: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER) },
+            0: { 0: new ChessFigure(FigureType.ROCK, FigureTeam.RELATIVE.THIS), 1: new ChessFigure(FigureType.KNIGHT, FigureTeam.RELATIVE.THIS), 2: new ChessFigure(FigureType.BISHOP, FigureTeam.RELATIVE.THIS), 3: new ChessFigure(FigureType.QUEEN, FigureTeam.RELATIVE.THIS), 4: new ChessFigure(FigureType.KING, FigureTeam.RELATIVE.THIS), 5: new ChessFigure(FigureType.BISHOP, FigureTeam.RELATIVE.THIS), 6: new ChessFigure(FigureType.KNIGHT, FigureTeam.RELATIVE.THIS), 7: new ChessFigure(FigureType.ROCK, FigureTeam.RELATIVE.THIS) },
+            1: { 0: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 1: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 2: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 3: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 4: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 5: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 6: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 7: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS) },
             2: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() },
             3: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() },
             4: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() },
             5: { 0: new ChessFigure(), 1: new ChessFigure(), 2: new ChessFigure(), 3: new ChessFigure(), 4: new ChessFigure(), 5: new ChessFigure(), 6: new ChessFigure(), 7: new ChessFigure() },
-            6: { 0: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 1: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 2: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 3: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 4: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 5: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 6: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS), 7: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.THIS) },
-            7: { 0: new ChessFigure(FigureType.ROCK, FigureTeam.RELATIVE.THIS), 1: new ChessFigure(FigureType.KNIGHT, FigureTeam.RELATIVE.THIS), 2: new ChessFigure(FigureType.BISHOP, FigureTeam.RELATIVE.THIS), 3: new ChessFigure(FigureType.QUEEN, FigureTeam.RELATIVE.THIS), 4: new ChessFigure(FigureType.KING, FigureTeam.RELATIVE.THIS), 5: new ChessFigure(FigureType.BISHOP, FigureTeam.RELATIVE.THIS), 6: new ChessFigure(FigureType.KNIGHT, FigureTeam.RELATIVE.THIS), 7: new ChessFigure(FigureType.ROCK, FigureTeam.RELATIVE.THIS) }
+            6: { 0: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 1: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 2: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 3: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 4: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 5: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 6: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER), 7: new ChessFigure(FigureType.PAWN, FigureTeam.RELATIVE.OTHER) },
+            7: { 0: new ChessFigure(FigureType.ROCK, FigureTeam.RELATIVE.OTHER), 1: new ChessFigure(FigureType.KNIGHT, FigureTeam.RELATIVE.OTHER), 2: new ChessFigure(FigureType.BISHOP, FigureTeam.RELATIVE.OTHER), 3: new ChessFigure(FigureType.QUEEN, FigureTeam.RELATIVE.OTHER), 4: new ChessFigure(FigureType.KING, FigureTeam.RELATIVE.OTHER), 5: new ChessFigure(FigureType.BISHOP, FigureTeam.RELATIVE.OTHER), 6: new ChessFigure(FigureType.KNIGHT, FigureTeam.RELATIVE.OTHER), 7: new ChessFigure(FigureType.ROCK, FigureTeam.RELATIVE.OTHER) }
         };
+
+        /** @type {{0: ChessFigure[], 1: ChessFigure[]}} */
+        this.killed = {
+            0: [],
+            1: []
+        };
+    }
+
+    copy() {
+        var newBoard = new ChessBoard();
+        for(var x = 0; x < 8; x++) {
+            for(var y = 0; y < 8; y++) {
+                newBoard.board[x][y] = Object.assign(Object.create(ChessFigure.prototype), this.board[x][y]);
+            }
+        }
+        return newBoard;
     }
 
     inverted() {
@@ -218,6 +260,35 @@ class ChessBoard {
     }
 
     /**
+     * @param {ChessMove} chessMove 
+     */
+    moveMove(chessMove) {
+        this.move(chessMove.fromX, chessMove.fromY, chessMove.toX, chessMove.toY);
+    }
+
+    /**
+     * 
+     * @param {number} fromX 
+     * @param {number} fromY 
+     * @param {number} toX 
+     * @param {number} toY 
+     */
+    move(fromX, fromY, toX, toY) {
+        if(this.board && this.board[toX] && this.board[toX][toY] && this.board[toX][toY].type) {
+            this.killed[this.board[x][y].team].push(this.board[x][y]);
+        }
+        this.board[toX][toY] = this.board[fromX][fromY];
+        this.board[fromX][fromY] = new ChessFigure();
+    }
+
+    kill(x, y) {
+        if(this.board && this.board[x] && this.board[x][y] && this.board[x][y].type) {
+            this.killed[this.board[x][y].team].push(this.board[x][y]);
+            this.board[x][y] = new ChessFigure();
+        }
+    }
+
+    /**
      * 
      * @param {Number} x
      * @param {Number} y
@@ -242,7 +313,7 @@ class ChessFigure {
     constructor(type=FigureType.NONE, team=FigureTeam.RELATIVE.THIS) {
         /** @type {FigureType} */
         this.type = type;
-        /** @type {Number} */
+        /** @type {FigureTeam} */
         this.team = team;
     }
 
@@ -291,6 +362,7 @@ class ChessFigure {
 
 module.exports.ChessFigure = ChessFigure;
 
+/** @enum {number} */
 const FigureType = Object.freeze({
     NONE:   0, //0b000
     KING:   1, //0b001
@@ -302,6 +374,7 @@ const FigureType = Object.freeze({
 });
 module.exports.FigureType = FigureType;
 
+/** @enum {number} */
 const FigureTeam = Object.freeze({
     RELATIVE: {
         THIS: 0,
@@ -313,3 +386,5 @@ const FigureTeam = Object.freeze({
     }
 });
 module.exports.FigureTeam = FigureTeam;
+
+const { ChessUtils } = require("./chessutils");
