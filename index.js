@@ -33,37 +33,8 @@ var serv = app.listen(process.env.PORT || 80);
 
 var io = require('socket.io')(serv, {});
 
-var board = new ChessBoard();
-board.board[0][4].setType(0);
-board.board[1][3].setType(0);
-board.board[1][4].setType(0);
-board.board[1][5].setType(0);
-board.board[1][7].setType(0);
-
-board.board[6][3].setType(0);
-board.board[6][2].setType(0);
-
-board.board[2][4].setType(FigureType.PAWN);
-
-board.board[3][3].setType(FigureType.PAWN).setTeam(FigureTeam.ABSOLUTE.BLACK);
-
-board.board[7][3].setType(FigureType.KING).setTeam(FigureTeam.ABSOLUTE.BLACK);
-board.board[7][4].setType(FigureType.QUEEN).setTeam(FigureTeam.ABSOLUTE.BLACK);
-
-//board.board[6][3].setType(FigureType.PAWN).setTeam(FigureTeam.ABSOLUTE.WHITE);
-
-board.board[6][4].setType(FigureType.NONE).setTeam(FigureTeam.ABSOLUTE.WHITE);
-board.board[6][5].setType(FigureType.NONE).setTeam(FigureTeam.ABSOLUTE.WHITE);
-board.board[4][4].setType(FigureType.KING).setTeam(FigureTeam.ABSOLUTE.WHITE);
-//board.board[3][1].setType(FigureType.KING).setTeam(FigureTeam.ABSOLUTE.WHITE);
-
-board.board[5][1].setType(FigureType.QUEEN).setTeam(FigureTeam.ABSOLUTE.WHITE);
-
-board.board[4][6].setType(FigureType.KNIGHT).setTeam(FigureTeam.ABSOLUTE.WHITE);
-board.move(0, 5, 3, 0);
-
 io.on("connection", (socket) => {
-    socket.emit("updateBoard", board);
+    /*socket.emit("updateBoard", board);
     socket.on('getMoves', (data) => {
         if(board.board[data.x][data.y] && board.board[data.x][data.y].type) {
             var moves = ChessUtils.getPossibleFields(board, data.x, data.y);
@@ -84,7 +55,7 @@ io.on("connection", (socket) => {
                 2: selected2
             });
         }
-    });
+    });*/
 });
 
 /** @type {{[id: string]: ChessGame}} */

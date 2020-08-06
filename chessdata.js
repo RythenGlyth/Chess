@@ -275,7 +275,7 @@ class ChessBoard {
      */
     move(fromX, fromY, toX, toY) {
         if(this.board && this.board[toX] && this.board[toX][toY] && this.board[toX][toY].type) {
-            this.killed[this.board[x][y].team].push(this.board[x][y]);
+            this.killed[this.board[toX][toY].team].push(this.board[toX][toY]);
         }
         this.board[toX][toY] = this.board[fromX][fromY];
         this.board[fromX][fromY] = new ChessFigure();
